@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire d'Environnements</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .upload-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .upload-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .upload-box-central {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .upload-box {
+            position: relative;
+        }
+
+        .upload-label {
+            display: block;
+            padding: 40px 20px;
+            background: white;
+            border: 3px dashed #dee2e6;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-label:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .upload-label.loaded {
+            border-color: #28a745;
+            border-style: solid;
+            background: #d4edda;
+        }
+
+        .upload-label.dev.loaded {
+            border-color: #28a745;
+        }
+
+        .upload-label.qal.loaded {
+            border-color: #ffc107;
+        }
+
+        .upload-label.prd.loaded {
+            border-color: #dc3545;
+        }
+
+        .upload-label input {
+            display: none;
+        }
+
+        .upload-label.dragover {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+
+        .env-status-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .env-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .env-status .status-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .env-status .button-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .env-status.loaded {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .env-status.loaded.dev {
+            background: #d4edda;
+        }
+
+        .env-status.loaded.qal {
+            background: #fff3cd;
+        }
+
+        .env-status.loaded.prd {
+            background: #f8d7da;
+        }
+
+        .mini-clear-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .mini-clear-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .mini-download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .mini-download-btn:hover {
+            background: #218838;
+            transform: scale(1.1);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .upload-hint {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .upload-hint.mac-info {
+            color: #856404;
+            background: #fff3cd;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            border: 1px solid #ffeaa7;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .badge.dev {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge.qal {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .badge.prd {
+            background: #dc3545;
+            color: white;
+        }
+
+        .clear-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        .upload-box.loaded .clear-btn {
+            display: block;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        th:first-child {
+            width: 25%;
+            background: #e9ecef;
+        }
+
+        th.dev {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        th.qal {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        th.prd {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: top;
+        }
+
+        td:first-child {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .value-cell {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #212529;
+            word-break: break-all;
+        }
+
+        .value-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .value-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-error, .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .add-var-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .add-var-row input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .add-var-row button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .add-var-row button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Gestionnaire d'Environnements</h1>
+            <p>Chargez vos fichiers .env et comparez les variables par environnement</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-row">
+                <div class="upload-box-central">
+                    <div class="upload-box" id="central-upload-box">
+                        <label for="multi-upload" class="upload-label" id="multi-upload-label">
+                            <div class="upload-icon">📂</div>
+                            <div class="upload-text">Sélectionner vos fichiers .env</div>
+                            <div class="upload-hint">Cliquez pour sélectionner ou glissez-déposez plusieurs fichiers</div>
+                            <div id="mac-hint" class="upload-hint mac-info" style="display: none; margin-top: 8px;"><small>💡 Sur macOS : <kbd>Cmd + Shift + .</kbd> pour voir les fichiers cachés</small></div>
+                            <input type="file" id="multi-upload" accept="*/*" multiple onchange="loadMultipleFiles(this)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="env-status-row">
+                <!-- Les statuts d'environnement seront créés dynamiquement ici -->
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-primary" onclick="addNewVariable()">➕ Ajouter une variable</button>
+                <button class="btn btn-success" onclick="exportAll()">💾 Exporter tous les .env</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="alert" class="alert"></div>
+            <div id="table-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const envData = {};
+        const envColors = {
+            na: '#6c757d',       // Gris pour NA (Not Applicable)
+            dev: '#28a745',
+            qal: '#ffc107',
+            prd: '#dc3545',
+            staging: '#17a2b8',
+            test: '#6f42c1',
+            production: '#e83e8c'
+        };
+
+        // Fonction pour obtenir une couleur pour un environnement
+        function getEnvColor(env) {
+            return envColors[env] || '#6c757d'; // Couleur par défaut grise
+        }
+
+        // Fonction pour obtenir le nom d'affichage d'un environnement
+        function getEnvDisplayName(env) {
+            const displayNames = {
+                na: 'NA',
+                dev: 'DEV',
+                qal: 'QAL',
+                prd: 'PRD',
+                staging: 'STAGING',
+                test: 'TEST',
+                production: 'PROD'
+            };
+            return displayNames[env] || env.toUpperCase();
+        }
+
+        function detectEnvironment(fileName) {
+            const lowerName = fileName.toLowerCase();
+
+            // Fichier .env sans suffixe = environnement NA (Not Applicable)
+            if (lowerName === '.env') {
+                return 'na';
+            }
+
+            // Patterns spécifiques pour les environnements connus
+            if (lowerName.includes('.dev') || lowerName.includes('dev.')) {
+                return 'dev';
+            } else if (lowerName.includes('.qal') || lowerName.includes('qal.')) {
+                return 'qal';
+            } else if (lowerName.includes('.prd') || lowerName.includes('prd.')) {
+                return 'prd';
+            }
+
+            // Pattern générique pour détecter d'autres environnements
+            // Ex: .env.staging, .env.test, .env.production, etc.
+            const envMatch = lowerName.match(/\.env\.([a-zA-Z0-9_-]+)/);
+            if (envMatch) {
+                return envMatch[1].toLowerCase();
+            }
+
+            // Si aucun environnement détecté, essayer de deviner
+            return null;
+        }
+
+        function loadMultipleFiles(input) {
+            const files = Array.from(input.files);
+            if (files.length === 0) return;
+
+            let loadedCount = 0;
+            let errorCount = 0;
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const content = e.target.result;
+                    const detectedEnv = detectEnvironment(file.name);
+
+                    if (!detectedEnv) {
+                        showAlert(`Impossible de déterminer l'environnement pour ${file.name}. Le nom doit contenir 'dev', 'qal' ou 'prd'.`, 'error');
+                        errorCount++;
+                        return;
+                    }
+
+                    // Valider le fichier .env
+                    const errors = validateEnvFile(content);
+                    if (errors.length > 0) {
+                        showAlert(`Erreurs dans le fichier ${file.name}:\n${errors.join('\n')}`, 'error');
+                        errorCount++;
+                        return;
+                    }
+
+                    // Initialiser l'environnement s'il n'existe pas encore
+                    if (!envData[detectedEnv]) {
+                        envData[detectedEnv] = {};
+                    }
+
+                    parseEnvFile(detectedEnv, content);
+                    updateEnvironmentStatus(detectedEnv, file.name);
+                    loadedCount++;
+                };
+
+                reader.onerror = () => {
+                    showAlert(`Erreur lors de la lecture du fichier ${file.name}`, 'error');
+                    errorCount++;
+                };
+
+                reader.readAsText(file);
+            });
+
+            // Attendre que tous les fichiers soient traités
+            setTimeout(() => {
+                if (loadedCount > 0) {
+                    renderTable();
+                    showAlert(`${loadedCount} fichier(s) chargé(s) avec succès${errorCount > 0 ? ` (${errorCount} erreur(s))` : ''}`, errorCount > 0 ? 'info' : 'success');
+                }
+            }, 100);
+        }
+
+        function updateEnvironmentStatus(env, fileName) {
+            // Créer ou mettre à jour l'élément de statut pour cet environnement
+            let statusElement = document.getElementById(`${env}-status`);
+
+            if (!statusElement) {
+                // Créer un nouvel élément de statut
+                const statusRow = document.querySelector('.env-status-row');
+                const newStatus = document.createElement('div');
+                newStatus.className = 'env-status';
+                newStatus.id = `${env}-status`;
+
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.style.backgroundColor = getEnvColor(env);
+                badge.textContent = getEnvDisplayName(env);
+
+                const statusText = document.createElement('span');
+                statusText.className = 'status-text';
+                statusText.id = `${env}-status-text`;
+                statusText.textContent = 'Aucun fichier chargé';
+
+                const buttonGroup = document.createElement('div');
+                buttonGroup.className = 'button-group';
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'mini-download-btn';
+                downloadBtn.onclick = () => downloadSingleEnv(env);
+                downloadBtn.title = `Télécharger ${getEnvDisplayName(env)}`;
+                downloadBtn.style.display = 'none';
+                downloadBtn.textContent = '💾';
+
+                const clearBtn = document.createElement('button');
+                clearBtn.className = 'mini-clear-btn';
+                clearBtn.onclick = () => clearEnv(env);
+                clearBtn.title = `Effacer ${getEnvDisplayName(env)}`;
+                clearBtn.style.display = 'none';
+                clearBtn.textContent = '×';
+
+                buttonGroup.appendChild(downloadBtn);
+                buttonGroup.appendChild(clearBtn);
+
+                newStatus.appendChild(badge);
+                newStatus.appendChild(statusText);
+                newStatus.appendChild(buttonGroup);
+                statusRow.appendChild(newStatus);
+
+                statusElement = newStatus;
+            }
+
+            const statusText = document.getElementById(`${env}-status-text`);
+            const downloadBtn = statusElement.querySelector('.mini-download-btn');
+            const clearBtn = statusElement.querySelector('.mini-clear-btn');
+
+            statusElement.classList.add('loaded');
+            statusText.textContent = `${fileName} (${Object.keys(envData[env]).length} variables)`;
+            downloadBtn.style.display = 'flex';
+            clearBtn.style.display = 'flex';
+        }
+
+        function parseEnvFile(env, content) {
+            envData[env] = {};
+            const lines = content.split('\n');
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (line && !line.startsWith('#')) {
+                    const equalIndex = line.indexOf('=');
+                    if (equalIndex > 0) {
+                        const key = line.substring(0, equalIndex).trim();
+                        const value = line.substring(equalIndex + 1).trim();
+                        envData[env][key] = value;
+                    }
+                }
+            });
+        }
+
+        function clearEnv(env) {
+            if (confirm(`Effacer toutes les variables ${getEnvDisplayName(env)} ?`)) {
+                envData[env] = {};
+
+                // Réinitialiser le statut de l'environnement
+                const statusElement = document.getElementById(`${env}-status`);
+                const statusText = document.getElementById(`${env}-status-text`);
+                const clearBtn = statusElement.querySelector('.mini-clear-btn');
+
+                if (statusElement) {
+                    statusElement.classList.remove('loaded');
+                    statusText.textContent = 'Aucun fichier chargé';
+                    const downloadBtn = statusElement.querySelector('.mini-download-btn');
+                    downloadBtn.style.display = 'none';
+                    clearBtn.style.display = 'none';
+                }
+
+                renderTable();
+                showAlert(`Variables ${getEnvDisplayName(env)} effacées`, 'info');
+            }
+        }
+
+        function renderTable() {
+            const container = document.getElementById('table-content');
+
+            const allKeys = new Set();
+            const availableEnvs = Object.keys(envData);
+
+            // Collecter toutes les clés de tous les environnements
+            availableEnvs.forEach(env => {
+                Object.keys(envData[env]).forEach(key => allKeys.add(key));
+            });
+
+            if (allKeys.size === 0) {
+                const macInstructions = isMacOS() ? `
+                    <div class="upload-hint mac-info">
+                        <strong>💡 Sur macOS :</strong> Les fichiers .env sont cachés par défaut.<br>
+                        • Dans la boîte de dialogue : Appuyez <kbd>Cmd + Shift + .</kbd> pour afficher les fichiers cachés<br>
+                        • Sélectionnez plusieurs fichiers à la fois (ex: .env.dev, .env.qal, .env.prd)
+                    </div>
+                ` : '';
+
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <h3>Aucun fichier chargé</h3>
+                        <p>Sélectionnez vos fichiers .env ci-dessus pour commencer la comparaison</p>
+                        <p><small>Le système détecte automatiquement l'environnement (dev/qal/prd) basé sur le nom du fichier</small></p>
+                        ${macInstructions}
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedKeys = Array.from(allKeys).sort();
+
+            // Créer les en-têtes dynamiquement
+            let tableHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+            `;
+
+            availableEnvs.forEach(env => {
+                tableHTML += `<th style="background-color: ${getEnvColor(env)}20; color: ${getEnvColor(env)};">${getEnvDisplayName(env)}</th>`;
+            });
+
+            tableHTML += `
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            sortedKeys.forEach(key => {
+                tableHTML += `
+                    <tr>
+                        <td>${key}</td>
+                `;
+
+                availableEnvs.forEach(env => {
+                    tableHTML += `<td><input type="text" class="value-input" value="${envData[env][key] || ''}"
+                                       onchange="updateValue('${env}', '${key}', this.value)"></td>`;
+                });
+
+                tableHTML += `
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        function updateValue(env, key, value) {
+            if (value.trim() === '') {
+                delete envData[env][key];
+            } else {
+                envData[env][key] = value;
+            }
+        }
+
+        function addNewVariable() {
+            const varName = prompt('Nom de la nouvelle variable :');
+            if (varName && varName.trim()) {
+                const key = varName.trim().toUpperCase().replace(/\s+/g, '_');
+                envData.dev[key] = '';
+                envData.qal[key] = '';
+                envData.prd[key] = '';
+                renderTable();
+                showAlert(`Variable ${key} ajoutée`, 'success');
+            }
+        }
+
+        function downloadSingleEnv(env) {
+            if (!envData[env] || Object.keys(envData[env]).length === 0) {
+                showAlert(`Aucune donnée à exporter pour ${getEnvDisplayName(env)}`, 'info');
+                return;
+            }
+
+            const content = Object.entries(envData[env])
+                .map(([key, value]) => `${key}=${value}`)
+                .join('\n');
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `.env${env === 'na' ? '' : '.' + env}`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showAlert(`Fichier .env${env === 'na' ? '' : '.' + env} téléchargé`, 'success');
+        }
+
+        function exportAll() {
+            const availableEnvs = Object.keys(envData);
+            let exportedCount = 0;
+
+            availableEnvs.forEach(env => {
+                if (Object.keys(envData[env]).length > 0) {
+                    const content = Object.entries(envData[env])
+                        .map(([key, value]) => `${key}=${value}`)
+                        .join('\n');
+
+                    const blob = new Blob([content], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `.env.${env}`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    exportedCount++;
+                }
+            });
+
+            if (exportedCount > 0) {
+                showAlert(`${exportedCount} fichier(s) .env exporté(s)`, 'success');
+            } else {
+                showAlert('Aucun fichier à exporter', 'info');
+            }
+        }
+
+
+        function validateEnvFile(content) {
+            const lines = content.split('\n');
+            const errors = [];
+            const variables = new Set();
+
+            lines.forEach((line, index) => {
+                line = line.trim();
+                if (line && !line.startsWith('#')) {
+                    const equalIndex = line.indexOf('=');
+                    if (equalIndex <= 0) {
+                        errors.push(`Ligne ${index + 1}: Format invalide (attendu: CLE=VALEUR)`);
+                    } else {
+                        const key = line.substring(0, equalIndex).trim();
+                        if (!key) {
+                            errors.push(`Ligne ${index + 1}: Clé vide`);
+                        } else if (variables.has(key)) {
+                            errors.push(`Ligne ${index + 1}: Variable '${key}' dupliquée`);
+                        } else {
+                            variables.add(key);
+                        }
+                    }
+                }
+            });
+
+            return errors;
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.innerHTML = message.replace(/\n/g, '<br>');
+            const duration = type === 'error' ? 8000 : (type === 'info' ? 15000 : 3000);
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, duration);
+        }
+
+        function isMacOS() {
+            return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+        }
+
+
+
+        // Initialisation
+        if (isMacOS()) {
+            // Afficher le hint macOS pour l'upload central
+            document.getElementById('mac-hint').style.display = 'block';
+        }
+
+        // Drag & Drop pour l'upload central
+        const multiUploadLabel = document.getElementById('multi-upload-label');
+        multiUploadLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            multiUploadLabel.classList.add('dragover');
+        });
+        multiUploadLabel.addEventListener('dragleave', () => {
+            multiUploadLabel.classList.remove('dragover');
+        });
+        multiUploadLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            multiUploadLabel.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                // Simuler la sélection multiple
+                const input = document.getElementById('multi-upload');
+                // Créer un DataTransfer pour simuler files
+                const dt = new DataTransfer();
+                Array.from(files).forEach(file => dt.items.add(file));
+                input.files = dt.files;
+                loadMultipleFiles(input);
+            }
+        });
+
+        renderTable();
+    </script>
+</body>
+</html>
