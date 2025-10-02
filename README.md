@@ -1,58 +1,58 @@
-# 🔐 Gestionnaire d'Environnements
+# 🔐 Environment Manager
 
-Une application web moderne pour comparer et gérer les fichiers `.env` entre différents environnements (développement, qualification, production).
+A modern web application to compare and manage `.env` files across different environments (development, staging, production).
 
-## 🌟 Fonctionnalités
+## 🌟 Features
 
-- **Upload multiple** : Chargez plusieurs fichiers `.env` simultanément
-- **Détection automatique** : Détection automatique des environnements basée sur les noms de fichiers
-- **Comparaison visuelle** : Tableau de comparaison avec mise en surbrillance des différences
-- **Édition en ligne** : Modifiez les valeurs directement dans l'interface
-- **Export individuel** : Téléchargez chaque fichier `.env` modifié
-- **Gestion par environnement** : Support pour dev, qal, prd et autres environnements personnalisés
+- **Multiple Upload**: Load multiple `.env` files simultaneously
+- **Automatic Detection**: Automatic environment detection based on filenames
+- **Visual Comparison**: Comparison table with highlighted differences
+- **Inline Editing**: Edit values directly in the interface
+- **Individual Export**: Download each modified `.env` file
+- **Environment Management**: Support for dev, qal, prd and other custom environments
 
-## 🚀 Utilisation
+## 🚀 Usage
 
-1. **Sélection de fichiers** :
-   - Cliquez sur la zone de dépôt ou glissez-déposez vos fichiers `.env`
-   - Support pour les fichiers nommés `.env.dev`, `.env.qal`, `.env.prd`, etc.
+1. **File Selection**:
+   - Click on the upload area or drag-and-drop your `.env` files
+   - Supports files named `.env.dev`, `.env.qal`, `.env.prd`, etc.
 
-2. **Comparaison** :
-   - Visualisez toutes les variables dans un tableau comparatif
-   - Les colonnes sont colorées selon l'environnement
+2. **Comparison**:
+   - View all variables in a comparison table
+   - Columns are colored according to the environment
 
-3. **Édition** :
-   - Modifiez les valeurs directement dans le tableau
-   - Ajoutez de nouvelles variables avec le bouton "➕ Ajouter une variable"
+3. **Editing**:
+   - Edit values directly in the table
+   - Add new variables with the "➕ Add Variable" button
 
-4. **Export** :
-   - Téléchargez des fichiers `.env` mis à jour individuellement
-   - Exportez tous les environnements en une fois
+4. **Export**:
+   - Download updated `.env` files individually
+   - Export all environments at once
 
-## 💡 Astuces macOS
+## 💡 macOS Tips
 
-Sur macOS, les fichiers `.env` sont cachés par défaut. Pour les voir :
-- Dans la boîte de dialogue : Appuyez `Cmd + Shift + .`
-- Sélectionnez plusieurs fichiers à la fois
+On macOS, `.env` files are hidden by default. To view them:
+- In the dialog box: Press `Cmd + Shift + .`
+- Select multiple files at once
 
-## 🛠️ Environnements supportés
+## 🛠️ Supported Environments
 
-- `dev` - Développement (vert)
-- `qal` - Qualification (jaune)
-- `prd` - Production (rouge)
-- `staging` - Staging (bleu)
-- `test` - Test (violet)
-- `production` - Production alternative (rose)
+- `dev` - Development (green)
+- `qal` - Quality Assurance (yellow)
+- `prd` - Production (red)
+- `staging` - Staging (blue)
+- `test` - Test (purple)
+- `production` - Alternative Production (pink)
 
-## 📋 Prérequis
+## 📋 Prerequisites
 
-- Navigateur web moderne
-- Aucun serveur requis - fonctionne entièrement côté client
+- Modern web browser
+- No server required - works entirely client-side
 
-## 🔒 Sécurité
+## 🔒 Security
 
-Toutes les opérations se déroulent dans votre navigateur. Aucun fichier n'est envoyé sur un serveur externe.
+All operations take place in your browser. No files are sent to external servers.
 
 ---
 
-*Application créée avec ❤️ en HTML/CSS/JavaScript pur*
+*Application built with ❤️ using pure HTML/CSS/JavaScript*
