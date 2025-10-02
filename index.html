@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionnaire d'Environnements</title>
+    <title>Environment Manager</title>
     <style>
         * {
             margin: 0;
@@ -488,8 +488,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔐 Gestionnaire d'Environnements</h1>
-            <p>Chargez vos fichiers .env et comparez les variables par environnement</p>
+            <h1>🔐 Environment Manager</h1>
+            <p>Load your .env files and compare variables by environment</p>
+            <p style="opacity: 0.8; font-size: 0.9rem; margin-top: 10px;">
+                🔒 Your files never leave your browser - everything stays on your machine
+            </p>
         </div>
 
         <div class="upload-section">
@@ -498,9 +501,12 @@
                     <div class="upload-box" id="central-upload-box">
                         <label for="multi-upload" class="upload-label" id="multi-upload-label">
                             <div class="upload-icon">📂</div>
-                            <div class="upload-text">Sélectionner vos fichiers .env</div>
-                            <div class="upload-hint">Cliquez pour sélectionner ou glissez-déposez plusieurs fichiers</div>
-                            <div id="mac-hint" class="upload-hint mac-info" style="display: none; margin-top: 8px;"><small>💡 Sur macOS : <kbd>Cmd + Shift + .</kbd> pour voir les fichiers cachés</small></div>
+                            <div class="upload-text">Select your .env files</div>
+                            <div class="upload-hint">Click to select or drag and drop multiple files</div>
+                            <div style="font-size: 0.8rem; color: #6c757d; margin-top: 8px; text-align: center;">
+                                🔒 Your files are processed locally - completely private and secure
+                            </div>
+                            <div id="mac-hint" class="upload-hint mac-info" style="display: none; margin-top: 8px;"><small>💡 On macOS: <kbd>Cmd + Shift + .</kbd> to show hidden files</small></div>
                             <input type="file" id="multi-upload" accept="*/*" multiple onchange="loadMultipleFiles(this)">
                         </label>
                     </div>
@@ -512,8 +518,8 @@
             </div>
 
             <div class="actions-bar">
-                <button class="btn btn-primary" onclick="addNewVariable()">➕ Ajouter une variable</button>
-                <button class="btn btn-success" onclick="exportAll()">💾 Exporter tous les .env</button>
+                <button class="btn btn-primary" onclick="addNewVariable()">➕ Add Variable</button>
+                <button class="btn btn-success" onclick="exportAll()">💾 Export All .env</button>
             </div>
         </div>
 
@@ -535,12 +541,12 @@
             production: '#e83e8c'
         };
 
-        // Fonction pour obtenir une couleur pour un environnement
+        // Function to get a color for an environment
         function getEnvColor(env) {
-            return envColors[env] || '#6c757d'; // Couleur par défaut grise
+            return envColors[env] || '#6c757d'; // Default gray color
         }
 
-        // Fonction pour obtenir le nom d'affichage d'un environnement
+        // Function to get the display name of an environment
         function getEnvDisplayName(env) {
             const displayNames = {
                 na: 'NA',
@@ -557,12 +563,12 @@
         function detectEnvironment(fileName) {
             const lowerName = fileName.toLowerCase();
 
-            // Fichier .env sans suffixe = environnement NA (Not Applicable)
+            // .env file without suffix = NA environment (Not Applicable)
             if (lowerName === '.env') {
                 return 'na';
             }
 
-            // Patterns spécifiques pour les environnements connus
+            // Specific patterns for known environments
             if (lowerName.includes('.dev') || lowerName.includes('dev.')) {
                 return 'dev';
             } else if (lowerName.includes('.qal') || lowerName.includes('qal.')) {
@@ -571,14 +577,14 @@
                 return 'prd';
             }
 
-            // Pattern générique pour détecter d'autres environnements
-            // Ex: .env.staging, .env.test, .env.production, etc.
+            // Generic pattern to detect other environments
+            // E.g., .env.staging, .env.test, .env.production, etc.
             const envMatch = lowerName.match(/\.env\.([a-zA-Z0-9_-]+)/);
             if (envMatch) {
                 return envMatch[1].toLowerCase();
             }
 
-            // Si aucun environnement détecté, essayer de deviner
+            // If no environment detected, try to guess
             return null;
         }
 
@@ -596,20 +602,20 @@
                     const detectedEnv = detectEnvironment(file.name);
 
                     if (!detectedEnv) {
-                        showAlert(`Impossible de déterminer l'environnement pour ${file.name}. Le nom doit contenir 'dev', 'qal' ou 'prd'.`, 'error');
+                        showAlert(`Cannot determine environment for ${file.name}. The name must contain 'dev', 'qal' or 'prd'.`, 'error');
                         errorCount++;
                         return;
                     }
 
-                    // Valider le fichier .env
+                    // Validate the .env file
                     const errors = validateEnvFile(content);
                     if (errors.length > 0) {
-                        showAlert(`Erreurs dans le fichier ${file.name}:\n${errors.join('\n')}`, 'error');
+                        showAlert(`Errors in file ${file.name}:\n${errors.join('\n')}`, 'error');
                         errorCount++;
                         return;
                     }
 
-                    // Initialiser l'environnement s'il n'existe pas encore
+                    // Initialize environment if it doesn't exist yet
                     if (!envData[detectedEnv]) {
                         envData[detectedEnv] = {};
                     }
@@ -620,28 +626,28 @@
                 };
 
                 reader.onerror = () => {
-                    showAlert(`Erreur lors de la lecture du fichier ${file.name}`, 'error');
+                    showAlert(`Error reading file ${file.name}`, 'error');
                     errorCount++;
                 };
 
                 reader.readAsText(file);
             });
 
-            // Attendre que tous les fichiers soient traités
+            // Wait for all files to be processed
             setTimeout(() => {
                 if (loadedCount > 0) {
                     renderTable();
-                    showAlert(`${loadedCount} fichier(s) chargé(s) avec succès${errorCount > 0 ? ` (${errorCount} erreur(s))` : ''}`, errorCount > 0 ? 'info' : 'success');
+                    showAlert(`${loadedCount} file(s) loaded successfully${errorCount > 0 ? ` (${errorCount} error(s))` : ''}`, errorCount > 0 ? 'info' : 'success');
                 }
             }, 100);
         }
 
         function updateEnvironmentStatus(env, fileName) {
-            // Créer ou mettre à jour l'élément de statut pour cet environnement
+            // Create or update the status element for this environment
             let statusElement = document.getElementById(`${env}-status`);
 
             if (!statusElement) {
-                // Créer un nouvel élément de statut
+                // Create a new status element
                 const statusRow = document.querySelector('.env-status-row');
                 const newStatus = document.createElement('div');
                 newStatus.className = 'env-status';
@@ -655,7 +661,7 @@
                 const statusText = document.createElement('span');
                 statusText.className = 'status-text';
                 statusText.id = `${env}-status-text`;
-                statusText.textContent = 'Aucun fichier chargé';
+                statusText.textContent = 'No file loaded';
 
                 const buttonGroup = document.createElement('div');
                 buttonGroup.className = 'button-group';
@@ -663,14 +669,14 @@
                 const downloadBtn = document.createElement('button');
                 downloadBtn.className = 'mini-download-btn';
                 downloadBtn.onclick = () => downloadSingleEnv(env);
-                downloadBtn.title = `Télécharger ${getEnvDisplayName(env)}`;
+                downloadBtn.title = `Download ${getEnvDisplayName(env)}`;
                 downloadBtn.style.display = 'none';
                 downloadBtn.textContent = '💾';
 
                 const clearBtn = document.createElement('button');
                 clearBtn.className = 'mini-clear-btn';
                 clearBtn.onclick = () => clearEnv(env);
-                clearBtn.title = `Effacer ${getEnvDisplayName(env)}`;
+                clearBtn.title = `Clear ${getEnvDisplayName(env)}`;
                 clearBtn.style.display = 'none';
                 clearBtn.textContent = '×';
 
@@ -698,7 +704,7 @@
         function parseEnvFile(env, content) {
             envData[env] = {};
             const lines = content.split('\n');
-            
+
             lines.forEach(line => {
                 line = line.trim();
                 if (line && !line.startsWith('#')) {
@@ -713,24 +719,24 @@
         }
 
         function clearEnv(env) {
-            if (confirm(`Effacer toutes les variables ${getEnvDisplayName(env)} ?`)) {
+            if (confirm(`Clear all ${getEnvDisplayName(env)} variables?`)) {
                 envData[env] = {};
 
-                // Réinitialiser le statut de l'environnement
+                // Reset the environment status
                 const statusElement = document.getElementById(`${env}-status`);
                 const statusText = document.getElementById(`${env}-status-text`);
                 const clearBtn = statusElement.querySelector('.mini-clear-btn');
 
                 if (statusElement) {
                     statusElement.classList.remove('loaded');
-                    statusText.textContent = 'Aucun fichier chargé';
+                    statusText.textContent = 'No file loaded';
                     const downloadBtn = statusElement.querySelector('.mini-download-btn');
                     downloadBtn.style.display = 'none';
                     clearBtn.style.display = 'none';
                 }
 
                 renderTable();
-                showAlert(`Variables ${getEnvDisplayName(env)} effacées`, 'info');
+                showAlert(`${getEnvDisplayName(env)} variables cleared`, 'info');
             }
         }
 
@@ -740,7 +746,7 @@
             const allKeys = new Set();
             const availableEnvs = Object.keys(envData);
 
-            // Collecter toutes les clés de tous les environnements
+            // Collect all keys from all environments
             availableEnvs.forEach(env => {
                 Object.keys(envData[env]).forEach(key => allKeys.add(key));
             });
@@ -748,9 +754,9 @@
             if (allKeys.size === 0) {
                 const macInstructions = isMacOS() ? `
                     <div class="upload-hint mac-info">
-                        <strong>💡 Sur macOS :</strong> Les fichiers .env sont cachés par défaut.<br>
-                        • Dans la boîte de dialogue : Appuyez <kbd>Cmd + Shift + .</kbd> pour afficher les fichiers cachés<br>
-                        • Sélectionnez plusieurs fichiers à la fois (ex: .env.dev, .env.qal, .env.prd)
+                        <strong>💡 On macOS:</strong> .env files are hidden by default.<br>
+                        • In the dialog box: Press <kbd>Cmd + Shift + .</kbd> to show hidden files<br>
+                        • Select multiple files at once (e.g., .env.dev, .env.qal, .env.prd)
                     </div>
                 ` : '';
 
@@ -761,9 +767,9 @@
                                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                             </path>
                         </svg>
-                        <h3>Aucun fichier chargé</h3>
-                        <p>Sélectionnez vos fichiers .env ci-dessus pour commencer la comparaison</p>
-                        <p><small>Le système détecte automatiquement l'environnement (dev/qal/prd) basé sur le nom du fichier</small></p>
+                        <h3>No files loaded</h3>
+                        <p>Select your .env files above to start comparing</p>
+                        <p><small>The system automatically detects the environment (dev/qal/prd) based on the file name</small></p>
                         ${macInstructions}
                     </div>
                 `;
@@ -772,7 +778,7 @@
 
             const sortedKeys = Array.from(allKeys).sort();
 
-            // Créer les en-têtes dynamiquement
+            // Create headers dynamically
             let tableHTML = `
                 <div class="table-container">
                     <table>
@@ -825,20 +831,20 @@
         }
 
         function addNewVariable() {
-            const varName = prompt('Nom de la nouvelle variable :');
+            const varName = prompt('Name of the new variable:');
             if (varName && varName.trim()) {
                 const key = varName.trim().toUpperCase().replace(/\s+/g, '_');
                 envData.dev[key] = '';
                 envData.qal[key] = '';
                 envData.prd[key] = '';
                 renderTable();
-                showAlert(`Variable ${key} ajoutée`, 'success');
+                showAlert(`Variable ${key} added`, 'success');
             }
         }
 
         function downloadSingleEnv(env) {
             if (!envData[env] || Object.keys(envData[env]).length === 0) {
-                showAlert(`Aucune donnée à exporter pour ${getEnvDisplayName(env)}`, 'info');
+                showAlert(`No data to export for ${getEnvDisplayName(env)}`, 'info');
                 return;
             }
 
@@ -854,7 +860,7 @@
             a.click();
             URL.revokeObjectURL(url);
 
-            showAlert(`Fichier .env${env === 'na' ? '' : '.' + env} téléchargé`, 'success');
+            showAlert(`.env${env === 'na' ? '' : '.' + env} file downloaded`, 'success');
         }
 
         function exportAll() {
@@ -879,9 +885,9 @@
             });
 
             if (exportedCount > 0) {
-                showAlert(`${exportedCount} fichier(s) .env exporté(s)`, 'success');
+                showAlert(`${exportedCount} .env file(s) exported`, 'success');
             } else {
-                showAlert('Aucun fichier à exporter', 'info');
+                showAlert('No files to export', 'info');
             }
         }
 
@@ -896,13 +902,13 @@
                 if (line && !line.startsWith('#')) {
                     const equalIndex = line.indexOf('=');
                     if (equalIndex <= 0) {
-                        errors.push(`Ligne ${index + 1}: Format invalide (attendu: CLE=VALEUR)`);
+                        errors.push(`Line ${index + 1}: Invalid format (expected: KEY=VALUE)`);
                     } else {
                         const key = line.substring(0, equalIndex).trim();
                         if (!key) {
-                            errors.push(`Ligne ${index + 1}: Clé vide`);
+                            errors.push(`Line ${index + 1}: Empty key`);
                         } else if (variables.has(key)) {
-                            errors.push(`Ligne ${index + 1}: Variable '${key}' dupliquée`);
+                            errors.push(`Line ${index + 1}: Duplicate variable '${key}'`);
                         } else {
                             variables.add(key);
                         }
@@ -929,13 +935,13 @@
 
 
 
-        // Initialisation
+        // Initialization
         if (isMacOS()) {
-            // Afficher le hint macOS pour l'upload central
+            // Show macOS hint for central upload
             document.getElementById('mac-hint').style.display = 'block';
         }
 
-        // Drag & Drop pour l'upload central
+        // Drag & Drop for central upload
         const multiUploadLabel = document.getElementById('multi-upload-label');
         multiUploadLabel.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -949,9 +955,9 @@
             multiUploadLabel.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                // Simuler la sélection multiple
+                // Simulate multiple selection
                 const input = document.getElementById('multi-upload');
-                // Créer un DataTransfer pour simuler files
+                // Create a DataTransfer to simulate files
                 const dt = new DataTransfer();
                 Array.from(files).forEach(file => dt.items.add(file));
                 input.files = dt.files;

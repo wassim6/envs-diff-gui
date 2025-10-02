@@ -1,0 +1,57 @@
+# Fichiers système
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Fichiers d'éditeur
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+*.orig
+
+# Fichiers temporaires
+*.tmp
+*.temp
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Fichiers de cache du navigateur (si utilisés pour développement)
+.cache/
+.parcel-cache/
+
+# Dépendances (si ajoutées plus tard)
+node_modules/
+
+# Fichiers de build (si ajoutés plus tard)
+dist/
+build/
+
+# Environnements virtuels (si ajoutés plus tard)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Fichiers de couverture de tests (si ajoutés plus tard)
+coverage/
+
+# Clé API ou fichiers sensibles (si ajoutés plus tard)
+*.key
+*.pem
+secrets.json

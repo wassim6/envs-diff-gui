@@ -57,9 +57,13 @@ On macOS, `.env` files are hidden by default. To view them:
 - Modern web browser
 - No server required - works entirely client-side
 
-## 🔒 Security
+## 🔒 Security & Privacy
 
 All operations take place in your browser. No files are sent to external servers.
+
+- **100% Local Processing**: Your `.env` files never leave your machine
+- **No Data Collection**: No tracking, analytics, or data storage
+- **Complete Privacy**: Perfect for sensitive configuration files
 
 ---
 
