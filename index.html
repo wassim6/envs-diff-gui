@@ -834,6 +834,12 @@
             const varName = prompt('Name of the new variable:');
             if (varName && varName.trim()) {
                 const key = varName.trim().toUpperCase().replace(/\s+/g, '_');
+
+                // Initialize environments if they don't exist
+                if (!envData.dev) envData.dev = {};
+                if (!envData.qal) envData.qal = {};
+                if (!envData.prd) envData.prd = {};
+
                 envData.dev[key] = '';
                 envData.qal[key] = '';
                 envData.prd[key] = '';

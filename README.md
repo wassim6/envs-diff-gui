@@ -1,6 +1,7 @@
 # 🔐 Environment Manager
 
 A modern web application to compare and manage `.env` files across different environments (development, staging, production).
+**[🔗 https://wassim6.github.io/envs-diff-gui/](https://wassim6.github.io/envs-diff-gui/)**
 
 ## 🌟 Features
 
@@ -15,7 +16,7 @@ A modern web application to compare and manage `.env` files across different env
 
 Try the application online: **[🔗 https://wassim6.github.io/envs-diff-gui/](https://wassim6.github.io/envs-diff-gui/)**
 
-![Environment Manager Screenshot](screenshot.svg)
+![Environment Manager Screenshot](screenshot.png)
 
 > 💡 **Tip**: The application works entirely in your browser - no server required!
 
