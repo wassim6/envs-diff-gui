@@ -11,7 +11,15 @@ A modern web application to compare and manage `.env` files across different env
 - **Individual Export**: Download each modified `.env` file
 - **Environment Management**: Support for dev, qal, prd and other custom environments
 
-## 🚀 Usage
+## 🚀 Live Demo
+
+Try the application online: **[🔗 https://wassim6.github.io/envs-diff-gui/](https://wassim6.github.io/envs-diff-gui/)**
+
+![Environment Manager Screenshot](screenshot.svg)
+
+> 💡 **Tip**: The application works entirely in your browser - no server required!
+
+## 📖 Usage
 
 1. **File Selection**:
    - Click on the upload area or drag-and-drop your `.env` files
